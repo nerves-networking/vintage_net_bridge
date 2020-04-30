@@ -21,6 +21,7 @@ defmodule VintageNetBridge do
 
   alias VintageNet.Interface.RawConfig
   alias VintageNet.IP.IPv4Config
+  alias VintageNetBridge.Server
 
   @impl true
   def normalize(config), do: config
@@ -30,6 +31,7 @@ defmodule VintageNetBridge do
     normalized_config = normalize(config)
     bridge_config = normalized_config[:vintage_net_bridge]
     brctl = Keyword.fetch!(opts, :bin_brctl)
+    interfaces = Map.fetch!(bridge_config, :interfaces)
 
     up_cmds = [
       {:run, brctl, ["addbr", ifname]}
@@ -45,54 +47,61 @@ defmodule VintageNetBridge do
       source_config: normalized_config,
       up_cmds: up_cmds,
       down_cmds: down_cmds,
-      required_ifnames: Map.fetch!(bridge_config, :interfaces)
+      required_ifnames: [],
+      child_specs: [{Server, [brctl, ifname, interfaces]}]
     }
 
-    with_bridge_config = Enum.reduce(bridge_config, base, fn
-      # TODO(Connor) we may need a genserver here to listen for the interfaces
-      # in this list to populate, and add them to the brige, maybe via a :ioctl 
-      {:interfaces, interfaces}, raw_config when is_list(interfaces) ->
-        addifs =
-          Enum.map(interfaces, fn addif ->
-            {:run, brctl, ["addif", raw_config.ifname, addif]}
-          end)
+    with_bridge_config =
+      Enum.reduce(bridge_config, base, fn
+        # TODO(Connor) we may need a genserver here to listen for the interfaces
+        # in this list to populate, and add them to the brige, maybe via a :ioctl 
+        {:interfaces, interfaces}, raw_config when is_list(interfaces) ->
+          addifs =
+            Enum.map(interfaces, fn addif ->
+              {:run_ignore_errors, brctl, ["addif", raw_config.ifname, addif]}
+            end)
 
-        %{raw_config | up_cmds: raw_config.up_cmds ++ addifs}
+          %{raw_config | up_cmds: raw_config.up_cmds ++ addifs}
 
-      {:forward_delay, value}, raw_config ->
-        up_cmd = {:run, brctl, ["setfd", raw_config.ifname, value]}
-        %{raw_config | up_cmds: raw_config.up_cmds ++ [up_cmd]}
+        # {:interfaces, _interfaces}, raw_config ->
+        #   raw_config
 
-      {:priority, value}, raw_config ->
-        up_cmd = {:run, brctl, ["setbridgeprio", raw_config.ifname, value]}
-        %{raw_config | up_cmds: raw_config.up_cmds ++ [up_cmd]}
+        {:forward_delay, value}, raw_config ->
+          up_cmd = {:run, brctl, ["setfd", raw_config.ifname, value]}
+          %{raw_config | up_cmds: raw_config.up_cmds ++ [up_cmd]}
 
-      {:hello_time, value}, raw_config ->
-        up_cmd = {:run, brctl, ["sethello", raw_config.ifname, value]}
-        %{raw_config | up_cmds: raw_config.up_cmds ++ [up_cmd]}
+        {:priority, value}, raw_config ->
+          up_cmd = {:run, brctl, ["setbridgeprio", raw_config.ifname, value]}
+          %{raw_config | up_cmds: raw_config.up_cmds ++ [up_cmd]}
 
-      {:max_age, value}, raw_config ->
-        up_cmd = {:run, brctl, ["setmaxage", raw_config.ifname, value]}
-        %{raw_config | up_cmds: raw_config.up_cmds ++ [up_cmd]}
+        {:hello_time, value}, raw_config ->
+          up_cmd = {:run, brctl, ["sethello", raw_config.ifname, value]}
+          %{raw_config | up_cmds: raw_config.up_cmds ++ [up_cmd]}
 
-      {:path_cost, value}, raw_config ->
-        up_cmd = {:run, brctl, ["setpathcost", raw_config.ifname, value]}
-        %{raw_config | up_cmds: raw_config.up_cmds ++ [up_cmd]}
+        {:max_age, value}, raw_config ->
+          up_cmd = {:run, brctl, ["setmaxage", raw_config.ifname, value]}
+          %{raw_config | up_cmds: raw_config.up_cmds ++ [up_cmd]}
 
-      {:path_priority, value}, raw_config ->
-        up_cmd = {:run, brctl, ["setportprio", raw_config.ifname, value]}
-        %{raw_config | up_cmds: raw_config.up_cmds ++ [up_cmd]}
+        {:path_cost, value}, raw_config ->
+          up_cmd = {:run, brctl, ["setpathcost", raw_config.ifname, value]}
+          %{raw_config | up_cmds: raw_config.up_cmds ++ [up_cmd]}
 
-      {:hairpin, {port, value}}, raw_config when is_integer(port) and is_boolean(value) ->
-        up_cmd = {:run, brctl, ["hairpin", raw_config.ifname, port, bool_to_yn(value)]}
-        %{raw_config | up_cmds: raw_config.up_cmds ++ [up_cmd]}
+        {:path_priority, value}, raw_config ->
+          up_cmd = {:run, brctl, ["setportprio", raw_config.ifname, value]}
+          %{raw_config | up_cmds: raw_config.up_cmds ++ [up_cmd]}
 
-      {:stp, value}, raw_config when is_boolean(value) ->
-        up_cmd = {:run, brctl, ["stp", raw_config.ifname, bool_to_yn(value)]}
-        %{raw_config | up_cmds: raw_config.up_cmds ++ [up_cmd]}
-    end)
+        {:hairpin, {port, value}}, raw_config when is_integer(port) and is_boolean(value) ->
+          up_cmd = {:run, brctl, ["hairpin", raw_config.ifname, port, bool_to_yn(value)]}
+          %{raw_config | up_cmds: raw_config.up_cmds ++ [up_cmd]}
+
+        {:stp, value}, raw_config when is_boolean(value) ->
+          up_cmd = {:run, brctl, ["stp", raw_config.ifname, bool_to_yn(value)]}
+          %{raw_config | up_cmds: raw_config.up_cmds ++ [up_cmd]}
+      end)
+
     with_bridge_config
     |> IPv4Config.add_config(normalized_config, opts)
+
     # |> DhcpdConfig.add_config(normalized_config, opts)
     # |> DnsdConfig.add_config(normalized_config, opts)
   end

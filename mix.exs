@@ -50,8 +50,8 @@ defmodule VintageNetBridge.MixProject do
       {:vintage_net, "~> 0.8.0-dev", github: "nerves-networking/vintage_net", branch: "master"},
       {:credo, "~> 1.2", only: :test, runtime: false},
       {:dialyxir, "~> 1.0.0", only: [:dev, :test], runtime: false},
-      {:ex_doc, "~> 0.19", only: :docs, runtime: false},
-      {:excoveralls, "~> 0.8", only: :test, runtime: false}
+      {:ex_doc, "~> 0.22", only: :docs, runtime: false},
+      {:excoveralls, "~> 0.13", only: :test, runtime: false}
     ]
   end
 

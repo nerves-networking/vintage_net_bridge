@@ -1,6 +1,6 @@
 defmodule VintageNetBridge.Server do
   @moduledoc """
-  server that listens to the property tabel and adds and remove
+  Server that listens to the property table and adds and remove
   interfaces as those events happen
   """
   use GenServer
@@ -28,7 +28,7 @@ defmodule VintageNetBridge.Server do
         {:noreply, state}
 
       {error, code} ->
-        Logger.error("Bridge(#{state.bridge_ifname}) errror(#{code}): #{error} ")
+        Logger.error("Bridge(#{state.bridge_ifname}) error(#{code}): #{error} ")
         {:noreply, state}
     end
   end
@@ -39,7 +39,7 @@ defmodule VintageNetBridge.Server do
   #     {_, 0} ->
   #       {:noreply, state}
   #     {error, code} ->
-  #       Logger.error("Bridge(#{state.bridge_ifname}) errror(#{code}): #{error} ")
+  #       Logger.error("Bridge(#{state.bridge_ifname}) error(#{code}): #{error} ")
   #       {:noreply, state}
   #   end
   # end

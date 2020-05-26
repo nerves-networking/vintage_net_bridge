@@ -54,7 +54,7 @@ defmodule VintageNetBridge do
     with_bridge_config =
       Enum.reduce(bridge_config, base, fn
         # TODO(Connor) we may need a genserver here to listen for the interfaces
-        # in this list to populate, and add them to the brige, maybe via a :ioctl 
+        # in this list to populate, and add them to the bridge, maybe via a :ioctl
         {:interfaces, interfaces}, raw_config when is_list(interfaces) ->
           addifs =
             Enum.map(interfaces, fn addif ->

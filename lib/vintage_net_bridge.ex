@@ -4,8 +4,18 @@ defmodule VintageNetBridge do
   `VintageNetBridge`. The following additional fields are supported:
 
   * `:vintage_net_bridge` - Bridge options
+    * `:interfaces` - Set to a list of interface names to add to the bridge.
+      This option is required for the bridge to be useful.
+    * `:forward_delay`
+    * `:priority`
+    * `:hello_time`
+    * `:max_age`
+    * `:path_cost`
+    * `:path_priority`
+    * `:hairpin`
+    * `:stp`
 
-  Here's a typical configuration for setting up a bridge between ethernet and wifi
+  Here's an example configuration for setting up a bridge:
 
   ```elixir
   %{
@@ -15,6 +25,10 @@ defmodule VintageNetBridge do
       interfaces: ["eth0", "wlan0"],
     }
   }
+  ```
+
+  See [brctl(8)](https://www.man7.org/linux/man-pages/man8/brctl.8.html) for
+  more information on individual options.
   """
 
   @behaviour VintageNet.Technology
@@ -67,31 +81,33 @@ defmodule VintageNetBridge do
         #   raw_config
 
         {:forward_delay, value}, raw_config ->
-          up_cmd = {:run, brctl, ["setfd", raw_config.ifname, value]}
+          up_cmd = {:run, brctl, ["setfd", raw_config.ifname, to_string(value)]}
           %{raw_config | up_cmds: raw_config.up_cmds ++ [up_cmd]}
 
         {:priority, value}, raw_config ->
-          up_cmd = {:run, brctl, ["setbridgeprio", raw_config.ifname, value]}
+          up_cmd = {:run, brctl, ["setbridgeprio", raw_config.ifname, to_string(value)]}
           %{raw_config | up_cmds: raw_config.up_cmds ++ [up_cmd]}
 
         {:hello_time, value}, raw_config ->
-          up_cmd = {:run, brctl, ["sethello", raw_config.ifname, value]}
+          up_cmd = {:run, brctl, ["sethello", raw_config.ifname, to_string(value)]}
           %{raw_config | up_cmds: raw_config.up_cmds ++ [up_cmd]}
 
         {:max_age, value}, raw_config ->
-          up_cmd = {:run, brctl, ["setmaxage", raw_config.ifname, value]}
+          up_cmd = {:run, brctl, ["setmaxage", raw_config.ifname, to_string(value)]}
           %{raw_config | up_cmds: raw_config.up_cmds ++ [up_cmd]}
 
         {:path_cost, value}, raw_config ->
-          up_cmd = {:run, brctl, ["setpathcost", raw_config.ifname, value]}
+          up_cmd = {:run, brctl, ["setpathcost", raw_config.ifname, to_string(value)]}
           %{raw_config | up_cmds: raw_config.up_cmds ++ [up_cmd]}
 
         {:path_priority, value}, raw_config ->
-          up_cmd = {:run, brctl, ["setportprio", raw_config.ifname, value]}
+          up_cmd = {:run, brctl, ["setportprio", raw_config.ifname, to_string(value)]}
           %{raw_config | up_cmds: raw_config.up_cmds ++ [up_cmd]}
 
         {:hairpin, {port, value}}, raw_config when is_integer(port) and is_boolean(value) ->
-          up_cmd = {:run, brctl, ["hairpin", raw_config.ifname, port, bool_to_yn(value)]}
+          up_cmd =
+            {:run, brctl, ["hairpin", raw_config.ifname, to_string(port), bool_to_yn(value)]}
+
           %{raw_config | up_cmds: raw_config.up_cmds ++ [up_cmd]}
 
         {:stp, value}, raw_config when is_boolean(value) ->

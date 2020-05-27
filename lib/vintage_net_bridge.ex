@@ -34,7 +34,7 @@ defmodule VintageNetBridge do
   @behaviour VintageNet.Technology
 
   alias VintageNet.Interface.RawConfig
-  alias VintageNet.IP.IPv4Config
+  alias VintageNet.IP.{IPv4Config, DhcpdConfig, DnsdConfig}
   alias VintageNetBridge.Server
 
   @impl true
@@ -73,9 +73,8 @@ defmodule VintageNetBridge do
       child_specs: [{Server, [brctl, ifname, interfaces]}]
     }
     |> IPv4Config.add_config(normalized_config, opts)
-
-    # |> DhcpdConfig.add_config(normalized_config, opts)
-    # |> DnsdConfig.add_config(normalized_config, opts)
+    |> DhcpdConfig.add_config(normalized_config, opts)
+    |> DnsdConfig.add_config(normalized_config, opts)
   end
 
   @impl true

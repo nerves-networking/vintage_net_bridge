@@ -13,7 +13,7 @@ defmodule VintageNetBridge.Server do
   @impl GenServer
   def init([brctl, bridge_ifname, interfaces]) do
     for ifname <- interfaces do
-      :ok = VintageNet.subscribe(["interface", ifname])
+      :ok = VintageNet.subscribe(["interface", ifname, "present"])
     end
 
     {:ok, %{brctl: brctl, bridge_ifname: bridge_ifname, interfaces: interfaces}}

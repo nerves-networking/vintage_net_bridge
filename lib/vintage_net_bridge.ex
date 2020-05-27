@@ -72,7 +72,7 @@ defmodule VintageNetBridge do
       up_cmds: up_cmds ++ bridge_up_cmds ++ addif_up_cmds,
       down_cmds: down_cmds,
       required_ifnames: [],
-      child_specs: [{Server, [brctl, ifname, interfaces]}]
+      child_specs: [{Server, %{brctl: brctl, bridge_ifname: ifname, interfaces: interfaces}}]
     }
     |> IPv4Config.add_config(normalized_config, opts)
     |> DhcpdConfig.add_config(normalized_config, opts)

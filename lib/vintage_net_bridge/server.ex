@@ -3,17 +3,29 @@ defmodule VintageNetBridge.Server do
   use GenServer
   require Logger
 
-  def start_link([brctl, bridge_ifname, interfaces]) do
-    GenServer.start_link(__MODULE__, [brctl, bridge_ifname, interfaces])
+  @doc """
+  Start a server that monitors interfaces for adding them to a bridge.
+
+  Pass in a map with the following:
+
+  * `:brctl` - the path to brctl
+  * `:bridge_ifname` - the name of the bridge interface
+  * `:interfaces` - a list of interface names to add to the bridge
+  """
+  @spec start_link(%{
+          brctl: Path.t(),
+          bridge_ifname: VintageNet.ifname(),
+          interfaces: [VintageNet.ifname()]
+        }) :: GenServer.on_start()
+  def start_link(args) do
+    GenServer.start_link(__MODULE__, args)
   end
 
   @impl GenServer
-  def init([brctl, bridge_ifname, interfaces]) do
-    for ifname <- interfaces do
-      :ok = VintageNet.subscribe(["interface", ifname, "present"])
-    end
+  def init(args) do
+    Enum.each(args.interfaces, &VintageNet.subscribe(["interface", &1, "present"]))
 
-    {:ok, %{brctl: brctl, bridge_ifname: bridge_ifname, interfaces: interfaces}}
+    {:ok, args}
   end
 
   @impl GenServer

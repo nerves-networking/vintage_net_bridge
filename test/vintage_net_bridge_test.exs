@@ -18,7 +18,8 @@ defmodule VintageNetBridgeTest do
       source_config: input,
       required_ifnames: [],
       child_specs: [
-        {VintageNetBridge.Server, ["brctl", "br0", ["eth0", "mesh0"]]},
+        {VintageNetBridge.Server,
+         %{brctl: "brctl", bridge_ifname: "br0", interfaces: ["eth0", "mesh0"]}},
         Utils.udhcpc_child_spec("br0", "unit_test"),
         {VintageNet.Interface.InternetConnectivityChecker, "br0"}
       ],
@@ -62,7 +63,8 @@ defmodule VintageNetBridgeTest do
       source_config: input,
       required_ifnames: [],
       child_specs: [
-        {VintageNetBridge.Server, ["brctl", "br0", ["eth0", "mesh0"]]},
+        {VintageNetBridge.Server,
+         %{brctl: "brctl", bridge_ifname: "br0", interfaces: ["eth0", "mesh0"]}},
         Utils.udhcpc_child_spec("br0", "unit_test"),
         {VintageNet.Interface.InternetConnectivityChecker, "br0"}
       ],

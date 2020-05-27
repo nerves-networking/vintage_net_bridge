@@ -30,30 +30,23 @@ defmodule VintageNetBridge.Server do
 
   @impl GenServer
   def handle_info({VintageNet, ["interface", ifname, "present"], _, true, _}, state) do
-    Logger.debug("adding ifname to bridge: #{state.bridge_ifname} #{ifname}")
-    # TODO(Connor) maybe put this in the table for others to use?
-    case MuonTrap.cmd(state.brctl, ["addif", state.bridge_ifname, ifname]) do
-      {_, 0} ->
-        {:noreply, state}
-
-      {error, code} ->
-        Logger.error("Bridge(#{state.bridge_ifname}) error(#{code}): #{error} ")
-        {:noreply, state}
-    end
+    Logger.debug("vintage_net_bridge: adding #{ifname} to #{state.bridge_ifname}")
+    _ = run_brctl(state, ["addif", state.bridge_ifname, ifname])
+    {:noreply, state}
   end
-
-  # def handle_info({VintageNet, ["interfaces", ifname, "present"], _, false, _}, state) do
-  #   # TODO(Connor) maybe put this in the table for others to use?
-  #   case MuonTrap.cmd(state.brctl, ["addif", state.bridge_ifname, ifname]) do
-  #     {_, 0} ->
-  #       {:noreply, state}
-  #     {error, code} ->
-  #       Logger.error("Bridge(#{state.bridge_ifname}) error(#{code}): #{error} ")
-  #       {:noreply, state}
-  #   end
-  # end
 
   def handle_info(_, state) do
     {:noreply, state}
+  end
+
+  defp run_brctl(state, args) do
+    case MuonTrap.cmd(state.brctl, args) do
+      {_, 0} ->
+        :ok
+
+      {error, code} ->
+        Logger.error("Bridge(#{state.bridge_ifname}) error(#{code}): #{error}")
+        :error
+    end
   end
 end

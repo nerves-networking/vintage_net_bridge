@@ -55,67 +55,23 @@ defmodule VintageNetBridge do
       {:run, brctl, ["delbr", ifname]}
     ]
 
-    base = %RawConfig{
+    bridge_up_cmds = Enum.flat_map(bridge_config, &config_to_cmd(&1, brctl, ifname))
+
+    addif_up_cmds =
+      Map.get(bridge_config, :interfaces, [])
+      |> Enum.map(fn addif ->
+        {:run_ignore_errors, brctl, ["addif", ifname, addif]}
+      end)
+
+    %RawConfig{
       ifname: ifname,
       type: __MODULE__,
       source_config: normalized_config,
-      up_cmds: up_cmds,
+      up_cmds: up_cmds ++ bridge_up_cmds ++ addif_up_cmds,
       down_cmds: down_cmds,
       required_ifnames: [],
       child_specs: [{Server, [brctl, ifname, interfaces]}]
     }
-
-    with_bridge_config =
-      Enum.reduce(bridge_config, base, fn
-        # TODO(Connor) we may need a genserver here to listen for the interfaces
-        # in this list to populate, and add them to the bridge, maybe via a :ioctl
-        {:interfaces, interfaces}, raw_config when is_list(interfaces) ->
-          addifs =
-            Enum.map(interfaces, fn addif ->
-              {:run_ignore_errors, brctl, ["addif", raw_config.ifname, addif]}
-            end)
-
-          %{raw_config | up_cmds: raw_config.up_cmds ++ addifs}
-
-        # {:interfaces, _interfaces}, raw_config ->
-        #   raw_config
-
-        {:forward_delay, value}, raw_config ->
-          up_cmd = {:run, brctl, ["setfd", raw_config.ifname, to_string(value)]}
-          %{raw_config | up_cmds: raw_config.up_cmds ++ [up_cmd]}
-
-        {:priority, value}, raw_config ->
-          up_cmd = {:run, brctl, ["setbridgeprio", raw_config.ifname, to_string(value)]}
-          %{raw_config | up_cmds: raw_config.up_cmds ++ [up_cmd]}
-
-        {:hello_time, value}, raw_config ->
-          up_cmd = {:run, brctl, ["sethello", raw_config.ifname, to_string(value)]}
-          %{raw_config | up_cmds: raw_config.up_cmds ++ [up_cmd]}
-
-        {:max_age, value}, raw_config ->
-          up_cmd = {:run, brctl, ["setmaxage", raw_config.ifname, to_string(value)]}
-          %{raw_config | up_cmds: raw_config.up_cmds ++ [up_cmd]}
-
-        {:path_cost, value}, raw_config ->
-          up_cmd = {:run, brctl, ["setpathcost", raw_config.ifname, to_string(value)]}
-          %{raw_config | up_cmds: raw_config.up_cmds ++ [up_cmd]}
-
-        {:path_priority, value}, raw_config ->
-          up_cmd = {:run, brctl, ["setportprio", raw_config.ifname, to_string(value)]}
-          %{raw_config | up_cmds: raw_config.up_cmds ++ [up_cmd]}
-
-        {:hairpin, {port, value}}, raw_config when is_integer(port) and is_boolean(value) ->
-          up_cmd =
-            {:run, brctl, ["hairpin", raw_config.ifname, to_string(port), bool_to_yn(value)]}
-
-          %{raw_config | up_cmds: raw_config.up_cmds ++ [up_cmd]}
-
-        {:stp, value}, raw_config when is_boolean(value) ->
-          up_cmd = {:run, brctl, ["stp", raw_config.ifname, bool_to_yn(value)]}
-          %{raw_config | up_cmds: raw_config.up_cmds ++ [up_cmd]}
-      end)
-
-    with_bridge_config
     |> IPv4Config.add_config(normalized_config, opts)
 
     # |> DhcpdConfig.add_config(normalized_config, opts)
@@ -132,6 +88,40 @@ defmodule VintageNetBridge do
   @impl true
   # TODO(connor) check for brctl utility
   def check_system(_opts), do: :ok
+
+  defp config_to_cmd({:forward_delay, value}, brctl, ifname) do
+    [{:run, brctl, ["setfd", ifname, to_string(value)]}]
+  end
+
+  defp config_to_cmd({:priority, value}, brctl, ifname) do
+    [{:run, brctl, ["setbridgeprio", ifname, to_string(value)]}]
+  end
+
+  defp config_to_cmd({:hello_time, value}, brctl, ifname) do
+    [{:run, brctl, ["sethello", ifname, to_string(value)]}]
+  end
+
+  defp config_to_cmd({:max_age, value}, brctl, ifname) do
+    [{:run, brctl, ["setmaxage", ifname, to_string(value)]}]
+  end
+
+  defp config_to_cmd({:path_cost, value}, brctl, ifname) do
+    [{:run, brctl, ["setpathcost", ifname, to_string(value)]}]
+  end
+
+  defp config_to_cmd({:path_priority, value}, brctl, ifname) do
+    [{:run, brctl, ["setportprio", ifname, to_string(value)]}]
+  end
+
+  defp config_to_cmd({:hairpin, {port, value}}, brctl, ifname) do
+    [{:run, brctl, ["hairpin", ifname, to_string(port), bool_to_yn(value)]}]
+  end
+
+  defp config_to_cmd({:stp, value}, brctl, ifname) do
+    [{:run, brctl, ["stp", ifname, bool_to_yn(value)]}]
+  end
+
+  defp config_to_cmd(_other, _brctl, _ifname), do: []
 
   defp bool_to_yn(true), do: "yes"
   defp bool_to_yn(false), do: "no"

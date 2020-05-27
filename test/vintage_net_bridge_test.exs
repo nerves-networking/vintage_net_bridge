@@ -76,13 +76,13 @@ defmodule VintageNetBridgeTest do
         {:run, "brctl", ["setfd", "br0", "1"]},
         {:run, "brctl", ["hairpin", "br0", "7", "no"]},
         {:run, "brctl", ["sethello", "br0", "3"]},
-        {:run_ignore_errors, "brctl", ["addif", "br0", "eth0"]},
-        {:run_ignore_errors, "brctl", ["addif", "br0", "mesh0"]},
         {:run, "brctl", ["setmaxage", "br0", "4"]},
         {:run, "brctl", ["setpathcost", "br0", "5"]},
         {:run, "brctl", ["setportprio", "br0", "6"]},
         {:run, "brctl", ["setbridgeprio", "br0", "2"]},
         {:run, "brctl", ["stp", "br0", "yes"]},
+        {:run_ignore_errors, "brctl", ["addif", "br0", "eth0"]},
+        {:run_ignore_errors, "brctl", ["addif", "br0", "mesh0"]},
         {:run, "ip", ["link", "set", "br0", "up"]}
       ]
     }

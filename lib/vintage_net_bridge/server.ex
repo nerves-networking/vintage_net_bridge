@@ -1,8 +1,5 @@
 defmodule VintageNetBridge.Server do
-  @moduledoc """
-  Server that listens to the property table and adds and remove
-  interfaces as those events happen
-  """
+  @moduledoc false
   use GenServer
   require Logger
 

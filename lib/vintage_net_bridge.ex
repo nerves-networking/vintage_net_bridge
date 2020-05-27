@@ -1,5 +1,7 @@
 defmodule VintageNetBridge do
   @moduledoc """
+  Configure network bridges with VintageNet
+
   Configurations for this technology are maps with a `:type` field set to
   `VintageNetBridge`. The following additional fields are supported:
 

@@ -45,6 +45,8 @@ jobs:
       - run: mix coveralls.circle
       - run: mix format --check-formatted
       - run: mix docs
+      - run: mix hex.build
+      - run: mix credo -a
       - run: mix dialyzer
       - save_cache:
           key: v1-mix-cache-{{ checksum "mix.lock" }}

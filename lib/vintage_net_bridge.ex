@@ -46,23 +46,22 @@ defmodule VintageNetBridge do
   def to_raw_config(ifname, config, opts) do
     normalized_config = normalize(config)
     bridge_config = normalized_config[:vintage_net_bridge]
-    brctl = Keyword.fetch!(opts, :bin_brctl)
     interfaces = Map.fetch!(bridge_config, :interfaces)
 
     up_cmds = [
-      {:run, brctl, ["addbr", ifname]}
+      {:run, "brctl", ["addbr", ifname]}
     ]
 
     down_cmds = [
-      {:run, brctl, ["delbr", ifname]}
+      {:run, "brctl", ["delbr", ifname]}
     ]
 
-    bridge_up_cmds = Enum.flat_map(bridge_config, &config_to_cmd(&1, brctl, ifname))
+    bridge_up_cmds = Enum.flat_map(bridge_config, &config_to_cmd(&1, "brctl", ifname))
 
     addif_up_cmds =
       Map.get(bridge_config, :interfaces, [])
       |> Enum.map(fn addif ->
-        {:run_ignore_errors, brctl, ["addif", ifname, addif]}
+        {:run_ignore_errors, "brctl", ["addif", ifname, addif]}
       end)
 
     %RawConfig{
@@ -72,7 +71,7 @@ defmodule VintageNetBridge do
       up_cmds: up_cmds ++ bridge_up_cmds ++ addif_up_cmds,
       down_cmds: down_cmds,
       required_ifnames: [],
-      child_specs: [{Server, %{brctl: brctl, bridge_ifname: ifname, interfaces: interfaces}}]
+      child_specs: [{Server, %{brctl: "brctl", bridge_ifname: ifname, interfaces: interfaces}}]
     }
     |> IPv4Config.add_config(normalized_config, opts)
     |> DhcpdConfig.add_config(normalized_config, opts)

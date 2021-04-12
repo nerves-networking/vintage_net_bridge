@@ -20,7 +20,7 @@ To use, add `:vintage_net_bridge` to your `mix` dependencies like this:
 ```elixir
 def deps do
   [
-    {:vintage_net_bridge, "~> 0.1.0"}
+    {:vintage_net_bridge, "~> 0.10.0"}
   ]
 end
 ```

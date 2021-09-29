@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.10.1
+
+* Changes
+  * Support `vintage_net v0.11.x` as well.
+
 ## v0.10.0
 
 This release is backwards compatible with v0.9.2. No changes are needed to

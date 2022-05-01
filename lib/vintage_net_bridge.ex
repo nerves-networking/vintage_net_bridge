@@ -36,13 +36,13 @@ defmodule VintageNetBridge do
   @behaviour VintageNet.Technology
 
   alias VintageNet.Interface.RawConfig
-  alias VintageNet.IP.{IPv4Config, DhcpdConfig, DnsdConfig}
+  alias VintageNet.IP.{DhcpdConfig, DnsdConfig, IPv4Config}
   alias VintageNetBridge.Server
 
-  @impl true
+  @impl VintageNet.Technology
   def normalize(config), do: config
 
-  @impl true
+  @impl VintageNet.Technology
   def to_raw_config(ifname, config, opts) do
     normalized_config = normalize(config)
     bridge_config = normalized_config[:vintage_net_bridge]
@@ -78,12 +78,12 @@ defmodule VintageNetBridge do
     |> DnsdConfig.add_config(normalized_config, opts)
   end
 
-  @impl true
+  @impl VintageNet.Technology
   def ioctl(_ifname, _command, _args) do
     {:error, :unsupported}
   end
 
-  @impl true
+  @impl VintageNet.Technology
   def check_system(_opts) do
     {:error, "unimplemented"}
   end

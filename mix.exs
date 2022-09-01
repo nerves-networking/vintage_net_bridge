@@ -11,7 +11,6 @@ defmodule VintageNetBridge.MixProject do
       elixir: "~> 1.9",
       test_coverage: [tool: ExCoveralls],
       start_permanent: Mix.env() == :prod,
-      build_embedded: true,
       deps: deps(),
       dialyzer: dialyzer(),
       docs: docs(),

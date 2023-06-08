@@ -3,7 +3,6 @@
 [![Hex version](https://img.shields.io/hexpm/v/vintage_net_bridge.svg "Hex version")](https://hex.pm/packages/vintage_net_bridge)
 [![API docs](https://img.shields.io/hexpm/v/vintage_net_bridge.svg?label=hexdocs "API docs")](https://hexdocs.pm/vintage_net_bridge/VintageNetBridge.html)
 [![CircleCI](https://circleci.com/gh/nerves-networking/vintage_net_bridge.svg?style=svg)](https://circleci.com/gh/nerves-networking/vintage_net_bridge)
-[![Coverage Status](https://coveralls.io/repos/github/nerves-networking/vintage_net_bridge/badge.svg?branch=master)](https://coveralls.io/github/nerves-networking/vintage_net_bridge?branch=master)
 
 `VintageNetBridge` adds support for creating Ethernet bridges with `VintageNet`.
 Bridging two networks joins them together so that they form one LAN. One use

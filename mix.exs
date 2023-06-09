@@ -60,7 +60,7 @@ defmodule VintageNetBridge.MixProject do
 
   defp dialyzer() do
     [
-      flags: [:race_conditions, :unmatched_returns, :error_handling, :underspecs]
+      flags: [:unmatched_returns, :error_handling, :underspecs]
     ]
   end
 

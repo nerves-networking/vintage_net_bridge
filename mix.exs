@@ -8,7 +8,7 @@ defmodule VintageNetBridge.MixProject do
     [
       app: :vintage_net_bridge,
       version: @version,
-      elixir: "~> 1.9",
+      elixir: "~> 1.11",
       test_coverage: [tool: ExCoveralls],
       start_permanent: Mix.env() == :prod,
       deps: deps(),
@@ -39,12 +39,11 @@ defmodule VintageNetBridge.MixProject do
   defp package do
     %{
       files: [
+        "CHANGELOG.md",
         "lib",
-        "test",
         "mix.exs",
         "README.md",
-        "LICENSE",
-        "CHANGELOG.md"
+        "LICENSE"
       ],
       licenses: ["Apache-2.0"],
       links: %{"GitHub" => @source_url}
@@ -53,9 +52,9 @@ defmodule VintageNetBridge.MixProject do
 
   defp deps do
     [
-      {:vintage_net, "~> 0.10.0 or ~> 0.11.0 or ~> 0.12.0 or ~> 0.13.0"},
+      {:vintage_net, "~> 0.12.0 or ~> 0.13.0"},
       {:credo, "~> 1.2", only: :test, runtime: false},
-      {:dialyxir, "~> 1.3.0", only: [:dev, :test], runtime: false},
+      {:dialyxir, "~> 1.3", only: [:dev, :test], runtime: false},
       {:ex_doc, "~> 0.22", only: :docs, runtime: false},
       {:excoveralls, "~> 0.13", only: :test, runtime: false}
     ]
@@ -63,7 +62,8 @@ defmodule VintageNetBridge.MixProject do
 
   defp dialyzer() do
     [
-      flags: [:race_conditions, :unmatched_returns, :error_handling, :underspecs]
+      flags: [:missing_return, :extra_return, :unmatched_returns, :error_handling, :underspecs],
+      plt_file: {:no_warn, "_build/plts/dialyzer.plt"}
     ]
   end
 

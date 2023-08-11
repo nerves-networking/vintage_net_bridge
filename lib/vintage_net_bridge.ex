@@ -56,7 +56,8 @@ defmodule VintageNetBridge do
       {:run, "brctl", ["delbr", ifname]}
     ]
 
-    bridge_up_cmds = Enum.flat_map(bridge_config, &config_to_cmd(&1, "brctl", ifname))
+    bridge_up_cmds =
+      bridge_config |> Enum.sort() |> Enum.flat_map(&config_to_cmd(&1, "brctl", ifname))
 
     addif_up_cmds =
       Map.get(bridge_config, :interfaces, [])

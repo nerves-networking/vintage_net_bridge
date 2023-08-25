@@ -40,7 +40,12 @@ defmodule VintageNetBridge do
   alias VintageNetBridge.Server
 
   @impl VintageNet.Technology
-  def normalize(config), do: config
+  def normalize(config) do
+    config
+    |> IPv4Config.normalize()
+    |> DhcpdConfig.normalize()
+    |> DnsdConfig.normalize()
+  end
 
   @impl VintageNet.Technology
   def to_raw_config(ifname, config, opts) do

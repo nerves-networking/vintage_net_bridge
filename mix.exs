@@ -54,7 +54,7 @@ defmodule VintageNetBridge.MixProject do
     [
       {:vintage_net, "~> 0.12.0 or ~> 0.13.0"},
       {:credo, "~> 1.2", only: :test, runtime: false},
-      {:dialyxir, "~> 1.3", only: [:dev, :test], runtime: false},
+      {:dialyxir, "~> 1.3", only: :dev, runtime: false},
       {:ex_doc, "~> 0.22", only: :docs, runtime: false},
       {:excoveralls, "~> 0.13", only: :test, runtime: false}
     ]

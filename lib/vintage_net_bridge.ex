@@ -54,6 +54,7 @@ defmodule VintageNetBridge do
     interfaces = Map.fetch!(bridge_config, :interfaces)
 
     up_cmds = [
+      {:run_ignore_errors, "brctl", ["delbr", ifname]},
       {:run, "brctl", ["addbr", ifname]}
     ]
 

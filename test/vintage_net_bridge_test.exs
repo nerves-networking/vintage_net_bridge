@@ -29,6 +29,7 @@ defmodule VintageNetBridgeTest do
         {:run, "ip", ["link", "set", "br0", "down"]}
       ],
       up_cmds: [
+        {:run_ignore_errors, "brctl", ["delbr", "br0"]},
         {:run, "brctl", ["addbr", "br0"]},
         {:run_ignore_errors, "brctl", ["addif", "br0", "eth0"]},
         {:run_ignore_errors, "brctl", ["addif", "br0", "mesh0"]},
@@ -74,6 +75,7 @@ defmodule VintageNetBridgeTest do
         {:run, "ip", ["link", "set", "br0", "down"]}
       ],
       up_cmds: [
+        {:run_ignore_errors, "brctl", ["delbr", "br0"]},
         {:run, "brctl", ["addbr", "br0"]},
         {:run, "brctl", ["setfd", "br0", "1"]},
         {:run, "brctl", ["hairpin", "br0", "7", "no"]},
@@ -133,6 +135,7 @@ defmodule VintageNetBridgeTest do
         {:run, "ip", ["link", "set", "br0", "down"]}
       ],
       up_cmds: [
+        {:run_ignore_errors, "brctl", ["delbr", "br0"]},
         {:run, "brctl", ["addbr", "br0"]},
         {:run_ignore_errors, "brctl", ["addif", "br0", "eth0"]},
         {:run_ignore_errors, "brctl", ["addif", "br0", "tap0"]},

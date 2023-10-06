@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.10.3
+
+* Changes
+  * Fix retry failure in up_cmds due to not cleaning up the existing bridge.
+
 ## v0.10.2
 
 * Changes

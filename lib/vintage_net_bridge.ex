@@ -1,3 +1,10 @@
+# SPDX-FileCopyrightText: 2020 Connor Rigby
+# SPDX-FileCopyrightText: 2020 Frank Hunleth
+# SPDX-FileCopyrightText: 2020 Matt Ludwigs
+# SPDX-FileCopyrightText: 2023 Ryota Kinukawa
+#
+# SPDX-License-Identifier: Apache-2.0
+#
 defmodule VintageNetBridge do
   @moduledoc """
   Configure network bridges with VintageNet

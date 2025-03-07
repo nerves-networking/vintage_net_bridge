@@ -1,3 +1,9 @@
+# SPDX-FileCopyrightText: 2020 Connor Rigby
+# SPDX-FileCopyrightText: 2020 Frank Hunleth
+# SPDX-FileCopyrightText: 2023 Ryota Kinukawa
+#
+# SPDX-License-Identifier: Apache-2.0
+#
 defmodule VintageNetBridgeTest do
   use ExUnit.Case
   alias VintageNet.Interface.RawConfig

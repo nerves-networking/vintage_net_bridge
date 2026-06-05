@@ -8,7 +8,7 @@ defmodule VintageNetBridge.MixProject do
     [
       app: :vintage_net_bridge,
       version: @version,
-      elixir: "~> 1.11",
+      elixir: "~> 1.15",
       test_coverage: [tool: ExCoveralls],
       start_permanent: Mix.env() == :prod,
       deps: deps(),
